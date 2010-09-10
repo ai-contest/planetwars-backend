@@ -20,6 +20,7 @@ cursor.execute("""
 leaderboard_id = connection.insert_id()
 f = open("ratings.txt", "r")
 f.readline()
+data = []
 for line in f:
   csv = ','.join(line.strip().split())
   tokens = csv.split(",")
@@ -27,10 +28,16 @@ for line in f:
     continue
   (rank, user_id, username, submission_id, elo, plus_bound, minus_bound, \
     num_games, score, oppo, draws) = tokens
+  adjusted = int(elo) - int(minus_bound)
+  data.append((adjusted,submission_id))
+data.sort()
+data.reverse()
+for i, d in enumerate(data):
+  (adjusted, submission_id) = d
   values = str(leaderboard_id) + "," + \
     str(submission_id) + "," + \
-    str(rank) + "," + \
-    "0,0,0," + elo
+    str(str(i+1)) + "," + \
+    "0,0,0," + str(adjusted)
   cursor.execute("""
     INSERT INTO rankings
     (leaderboard_id,submission_id,rank,wins,losses,draws,score)
