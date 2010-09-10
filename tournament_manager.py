@@ -95,9 +95,13 @@ while time.time() - start_time < time_limit:
     errors += "The engine did not report a winner."
   if "playback" in outcome:
     playback_string = outcome["playback"]
+  if "fail" in outcome:
+    fail_string = ', '.join(outcome["fail"])
+  else:
+    fail_string = ''
   if len(errors) == 0:
     cursor.execute("INSERT INTO games (winner,loser,map_id,draw,timestamp," + \
-      "player_one,player_two,playback_string) VALUES (" + \
+      "player_one,player_two,playback_string,fail) VALUES (" + \
       str(winner) + "," + \
       str(loser) + "," + \
       str(map_id) + "," + \
@@ -105,7 +109,8 @@ while time.time() - start_time < time_limit:
       str(timestamp) + "," + \
       str(player_one["submission_id"]) + "," + \
       str(player_two["submission_id"]) + "," + \
-      "'" + str(playback_string) + "')")
+      "'" + str(playback_string) + "'," + \
+      repr(fail_string) + ")"
   else:
     print errors
 

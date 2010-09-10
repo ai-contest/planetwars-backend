@@ -325,6 +325,12 @@ def play_game(map, max_turn_time, max_turns, players, debug=False):
           if order is None:
             sys.stderr.write("player " + str(i+1) + " kicked for making " + \
               "an unparseable order: " + line + "\n")
+            if "fail" not in outcome:
+              outcome["fail"] = []
+            msg = line
+            if len(msg) > 10:
+              msg[10:] = "..." # prevent putting really long messages here
+            outcome["fail"].append("player %d ordered: %s" % (i+1, msg))
             c.kill()
             kick_player_from_game(i+1, planets, fleets)
           else:
@@ -338,6 +344,9 @@ def play_game(map, max_turn_time, max_turns, players, debug=False):
         continue
       sys.stderr.write("player " + str(i+1) + " kicked for taking too " + \
         "long to move\n")
+      if "fail" not in outcome:
+        outcome["fail"] = []
+      outcome["fail"].append("player %d timed out" % (i+1))
       if "timeout" not in outcome:
         outcome["timeout"] = []
       outcome["timeout"].append(i+1)
@@ -348,10 +357,6 @@ def play_game(map, max_turn_time, max_turns, players, debug=False):
     remaining = remaining_players(planets, fleets)
     turn_number += 1
   for i, c in enumerate(clients):
-    if not c.is_alive:
-      if "fail" not in outcome:
-        outcome["fail"] = []
-      outcome["fail"].append(i+1)
     c.kill()
   playback += ":".join(turn_strings)
   outcome["winner"] = player_with_most_ships(planets, fleets)
