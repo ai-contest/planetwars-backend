@@ -75,6 +75,9 @@ def compile_function(language):
     out, err = system(['ghc', '--make', 'MyBot.hs', '-O2', '-v0'])
     err += check_path('MyBot')
     return out, err
+  if language == "Binary":
+    err = check_path('MyBot')
+    return "Binaries are already compiled", err
   if language == "C#":
     nukeglob('MyBot.exe')
     sources = safeglob('*.cs')
